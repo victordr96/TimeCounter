@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">TimeCounter</string>
+    <string name="estadoBT_conectado">Connected</string>
+    <string name="estadoBT_desconectado">Disconnected</string>
+    <string name="acceleration">Acceleration</string>
+    <string name="skidpad">Skidpad</string>
+    <string name="autocross">Autocross</string>
+    <string name="endurance">Endurance</string>
+    <string name="last">Last</string>
+    <string name="best">Best</string>
+    <string name="noBluetooth">This device do not have Bluetooth</string>
+    <string name="bluetoothActivado">Bluetooth Enabled</string>
+    <string name="bluetoothNoActivado">Bluetooth could not be enabled</string>
+</resources>
