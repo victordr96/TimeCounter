@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TimeCounter</string>
+    <string name="bluetoothNoActivado">El Bluetooth no ha pogut ser activat</string>
+    <string name="NoEscriureSD">No es pot escriure a l\'emmagatzament intern</string>
+    <string name="ArxiuGuardat">Arxiu guardat</string>
+    <string name="noCrearCarpeta">No s\'ha pogut crear el directori</string>
+    <string name="dialogoGuardar">Guardar les dades a un arxiu?</string>
+    <string name="exit">Sortir</string>
+    <string name="yes">Si</string>
+    <string name="no">No</string>
+    <string name="errorGuardar">L\'arxiu no s\'ha guardat, tornar-ho a intentar?</string>
+    <string name="time">Temps [s]</string>
+    <string name="average">Mitjana [s]</string>
+    <string name="estadoBT_conectado">Connectat</string>
+    <string name="estadoBT_desconectado">Desconnectat</string>
+    <string name="acceleration">Acceleració</string>
+    <string name="autocross">Volta ràpida</string>
+    <string name="endurance">Resistència</string>
+    <string name="last">Últim</string>
+    <string name="best">Millor</string>
+    <string name="noBluetooth">Aquest dispositiu no disposa de Bluetooth</string>
+    <string name="bluetoothActivado">Bluetooth activat</string>
+    <string name="skidpad">Skidpad</string>
+</resources>

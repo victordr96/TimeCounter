@@ -43,7 +43,13 @@ public class MenuActivity extends AppCompatActivity {
     }
 
     public void bluetooth(View view) {
-        Intent intent = new Intent(this, BluetoothActivity.class);
+        Intent intent = new Intent(this, MonitorActivity.class);
+        //Intent intent = new Intent(this, BluetoothActivity.class);
+        startActivity(intent);
+    }
+
+    public void estadistiques(View view) {
+        Intent intent = new Intent(this, EstadistiquesActivity.class);
         startActivity(intent);
     }
 }

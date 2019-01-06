@@ -7,6 +7,41 @@
     tools:context=".TempsActivity">
 
 
+    <ImageView
+        android:id="@+id/imgRestart"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginEnd="64dp"
+        android:onClick="volver"
+        app:layout_constraintBottom_toBottomOf="@+id/imgPause"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@color/colorAccent" />
+
+    <ImageView
+        android:id="@+id/imgPause"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="16dp"
+        android:onClick="volver"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/imgRestart"
+        app:layout_constraintStart_toEndOf="@+id/imgStart"
+        app:layout_constraintTop_toBottomOf="@+id/graph"
+        app:srcCompat="@color/colorAccent" />
+
+    <ImageView
+        android:id="@+id/imgStart"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="64dp"
+        android:onClick="volver"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/imgPause"
+        app:srcCompat="@color/colorAccent" />
+
     <TextView
         android:id="@+id/txtLast4"
         android:layout_width="wrap_content"
@@ -69,8 +104,7 @@
         android:id="@+id/textView5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="50dp"
-        android:layout_marginLeft="50dp"
+        android:layout_marginStart="64dp"
         android:layout_marginTop="40dp"
         android:text="@string/last"
         android:textSize="28sp"
@@ -91,11 +125,10 @@
         app:layout_constraintTop_toBottomOf="@+id/txtLast4" />
 
     <TextView
-        android:id="@+id/tstLast1"
+        android:id="@+id/txtLast1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
+        android:layout_marginStart="64dp"
         android:text="01:54.223"
         android:textSize="28sp"
         app:layout_constraintBaseline_toBaselineOf="@+id/textView5"
@@ -109,8 +142,8 @@
         android:layout_marginTop="16dp"
         android:text="01:54.223"
         android:textSize="24sp"
-        app:layout_constraintEnd_toEndOf="@+id/tstLast1"
-        app:layout_constraintTop_toBottomOf="@+id/tstLast1"
+        app:layout_constraintEnd_toEndOf="@+id/txtLast1"
+        app:layout_constraintTop_toBottomOf="@+id/txtLast1"
         tools:text="00:00.000" />
 
     <TextView
@@ -125,28 +158,27 @@
         tools:text="00:00.000" />
 
     <TextView
-        android:id="@+id/textView10"
+        android:id="@+id/txtBest"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="01:54.223"
         android:textSize="25sp"
         android:textStyle="bold"
         app:layout_constraintBaseline_toBaselineOf="@+id/textView6"
-        app:layout_constraintStart_toStartOf="@+id/tstLast1"
+        app:layout_constraintStart_toStartOf="@+id/txtLast1"
         tools:text="00:00.000" />
 
     <com.jjoe64.graphview.GraphView
         android:id="@+id/graph"
         android:layout_width="match_parent"
-        android:layout_height="200dip"
+        android:layout_height="0dp"
         android:layout_marginStart="16dp"
-        android:layout_marginLeft="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
         android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/imgRestart"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView6" />
 

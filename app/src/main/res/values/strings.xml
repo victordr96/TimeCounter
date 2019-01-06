@@ -11,4 +11,14 @@
     <string name="noBluetooth">This device do not have Bluetooth</string>
     <string name="bluetoothActivado">Bluetooth Enabled</string>
     <string name="bluetoothNoActivado">Bluetooth could not be enabled</string>
+    <string name="NoEscriureSD">Cannot Write to External Storage.</string>
+    <string name="ArxiuGuardat">File Saved</string>
+    <string name="noCrearCarpeta">Unable to create directory</string>
+    <string name="dialogoGuardar">Save data in file?</string>
+    <string name="exit">Exit</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="errorGuardar">File not saved, try again?</string>
+    <string name="time">Time [s]</string>
+    <string name="average">Average [s]</string>
 </resources>

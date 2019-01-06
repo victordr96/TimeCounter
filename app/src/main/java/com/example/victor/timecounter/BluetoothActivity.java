@@ -17,6 +17,8 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
@@ -24,8 +26,13 @@ import java.util.UUID;
 public class BluetoothActivity extends AppCompatActivity {
 
     private BluetoothAdapter mBluetoothAdapter;
+    BluetoothSocket btSocket = null;
+    InputStream tmpIn = null;
+    OutputStream tmpOut = null;
+    BluetoothDevice dispositivo=null;
     private ArrayList<String> BTdispositivosEncontrados;
-
+    static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    int i=0;
 
     private static final int REQUEST_ENABLE_BT = 1;
 
@@ -38,16 +45,39 @@ public class BluetoothActivity extends AppCompatActivity {
         BTdispositivosEncontrados = new ArrayList<String>();
         BTdispositivosEncontrados.add("Prueba");
         IntentFilter intentFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-    //    registerReceiver(mReceiver, intentFilter);
+
         ImageView imgBluetooth = findViewById(R.id.imgBluetooth);
         ImageView imgVolver = findViewById(R.id.imgVolver);
+        ImageView imgMonitor = findViewById(R.id.imgMonitor);
         Glide.with(this).load("file:///android_asset/bluetooth.png").into(imgBluetooth);
         Glide.with(this).load("file:///android_asset/volver.png").into(imgVolver);
+        Glide.with(this).load("file:///android_asset/screen.png").into(imgMonitor);
+
+
+
+
+
+        TextView txtView8 = findViewById(R.id.textView8);
+        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+        String addressA ="";
+        if (pairedDevices.size() > 0) {
+            // There are paired devices. Get the name and address of each paired device.
+            for (BluetoothDevice device : pairedDevices) {
+                String deviceName = device.getName();
+                String deviceHardwareAddress = device.getAddress(); // MAC address
+                addressA = deviceHardwareAddress;
+                txtView8.setText(txtView8.getText().toString() + "\n" + deviceName + " -- " + deviceHardwareAddress);
+            }
+            dispositivo = mBluetoothAdapter.getRemoteDevice(addressA);
+
+        }
+
     }
 
 
 
     public void volver(View view) {
+
         finish();
     }
 
@@ -61,44 +91,13 @@ public class BluetoothActivity extends AppCompatActivity {
         if (!mBluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
-            //IntentFilter BTIntent = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
-            //registerReceiver(mReceiver, BTIntent);
         } else {
             mBluetoothAdapter.disable();
-            //IntentFilter BTIntent = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
-            //registerReceiver(mReceiver, BTIntent);
         }
     }
 
 
-    /*
-    BroadcastReceiver mReceiver = new BroadcastReceiver() {
-        public void onReceive(Context context, Intent intent) {
-            Toast.makeText(getApplicationContext(),
-                    "mReceiver", Toast.LENGTH_SHORT).show();
-            String action = intent.getAction();
-            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                BTdispositivosEncontrados.add(device.getName() + " - " + device.getAddress());
-            }
 
-            TextView txtView8 = findViewById(R.id.textView8);
-
-            for(int i=0; i<BTdispositivosEncontrados.size(); i++){
-                txtView8.setText(txtView8.getText().toString()+BTdispositivosEncontrados.get(i));
-            }
-        }
-    };
-    */
-
-    void actualizarTxt(){
-        TextView txtView8 = findViewById(R.id.textView8);
-
-        for(int i=0; i<BTdispositivosEncontrados.size(); i++){
-            txtView8.setText("");
-            txtView8.setText(txtView8.getText().toString()+BTdispositivosEncontrados.get(i));
-        }
-    }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_ENABLE_BT) {
@@ -118,34 +117,14 @@ public class BluetoothActivity extends AppCompatActivity {
 
     public void buscarDispositivos(View view) {
 
-        if (mBluetoothAdapter.isDiscovering()) {
-            mBluetoothAdapter.cancelDiscovery();
-        }
 
-        BTdispositivosEncontrados.clear();
-      //  mBluetoothAdapter.startDiscovery();
-        Toast.makeText(getApplicationContext(),
-                "StartDiscovery", Toast.LENGTH_SHORT).show();
-
-
-        Set<BluetoothDevice> dispositivosVinculados = mBluetoothAdapter.getBondedDevices();
-        if (dispositivosVinculados.size() > 0) {
-            // Loop through paired devices
-            for (BluetoothDevice device : dispositivosVinculados) {
-                // Add the name and address to an array adapter to show in a ListView
-                BTdispositivosEncontrados.add(device.getName() + "   -   " + device.getAddress());
-            }
-        }
-        actualizarTxt();
     }
 
     public void cancelarBuscarDispositivos(View view) {
-       /*
-        mBluetoothAdapter.cancelDiscovery();
-        Toast.makeText(getApplicationContext(),
-               "StopDiscovery", Toast.LENGTH_SHORT).show();
-
-       */
+        try {
+            tmpOut.write(i);
+            i++;
+        } catch (IOException e) { }
     }
 
 
@@ -154,5 +133,35 @@ public class BluetoothActivity extends AppCompatActivity {
         super.onDestroy();
        // unregisterReceiver(mReceiver);
         mBluetoothAdapter.cancelDiscovery();
+
+        if(btSocket!=null){
+            try {
+                btSocket.close();
+            } catch (Exception e) {}
+
+            btSocket = null;
+
+        }
+    }
+
+    public void BTconnect(View view) {
+        try {
+            btSocket = dispositivo.createInsecureRfcommSocketToServiceRecord(myUUID);//create a RFCOMM (SPP) connection
+            btSocket.connect();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        try {
+            tmpIn = btSocket.getInputStream();
+            tmpOut = btSocket.getOutputStream();
+        } catch (IOException e) { }
+
+    }
+
+    public void monitor(View view) {
+        Intent intent = new Intent(this, MonitorActivity.class);
+        startActivity(intent);
     }
 }

@@ -150,6 +150,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/imgAjustes"
         app:layout_constraintTop_toTopOf="@+id/imgAjustes"
+        android:onClick="estadistiques"
         app:srcCompat="@color/colorAccent" />
 
 
