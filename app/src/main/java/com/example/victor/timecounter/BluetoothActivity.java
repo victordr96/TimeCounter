@@ -43,7 +43,6 @@ public class BluetoothActivity extends AppCompatActivity {
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         BTdispositivosEncontrados = new ArrayList<String>();
-        BTdispositivosEncontrados.add("Prueba");
         IntentFilter intentFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
 
         ImageView imgBluetooth = findViewById(R.id.imgBluetooth);

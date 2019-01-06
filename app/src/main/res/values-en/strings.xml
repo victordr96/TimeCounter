@@ -22,4 +22,7 @@
     <string name="ArxiuGuardat">File Saved</string>
     <string name="NoEscriureSD">Cannot Write to External Storage.</string>
     <string name="bluetoothNoActivado">Bluetooth could not be enabled</string>
+    <string name="noLlegir">Cannot Read from External Storage.</string>
+    <string name="noArxius">No files are found</string>
+    <string name="noSend">Data not sent</string>
 </resources>

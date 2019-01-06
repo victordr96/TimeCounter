@@ -2,6 +2,7 @@ package com.example.victor.timecounter;
 
 import android.Manifest;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
@@ -37,6 +38,7 @@ public class TempsActivity extends AppCompatActivity {
 
     Boolean TEST=true; //si true, genera dades aleatories sense bluetooth per provar
     ArrayList<String> temps = new ArrayList<String>();
+    GraphView graph;
     LineGraphSeries<DataPoint> series;
     LineGraphSeries<DataPoint> average;
     private CountDownTimer mCountDownTimer;
@@ -51,12 +53,18 @@ public class TempsActivity extends AppCompatActivity {
     int bestD=99;
     int bestM=999;
     String best;
+    String prova="";
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_temps);
+
+        Intent intent = getIntent();
+        if(intent!=null){
+            prova = intent.getStringExtra("Prova");
+        }
 
         txtLast1 = findViewById(R.id.txtLast1);
         txtLast2 = findViewById(R.id.txtLast2);
@@ -82,7 +90,6 @@ public class TempsActivity extends AppCompatActivity {
         txtLast3.setText("--:--:---");
         txtLast4.setText("--:--:---");
         txtBest.setText("--:--:---");
-
 
         //anadirTiempo(1, 50, 123);
         //anadirTiempo(2, 51, 124);
@@ -172,11 +179,17 @@ public class TempsActivity extends AppCompatActivity {
         valoresMedia[0] =  new DataPoint(0, sumaTiempos/graphPos);
         valoresMedia[1] =  new DataPoint(graphPos, sumaTiempos/graphPos);
         average.resetData(valoresMedia);
+
+
+        if(graphPos>20) graph.getViewport().setMinX(graphPos-20);
+        else graph.getViewport().setMinX(1);
+
+        graph.getViewport().setMaxX(graphPos);
     }
 
 
     void graphInit(){
-        GraphView graph = (GraphView) findViewById(R.id.graph);
+        graph = (GraphView) findViewById(R.id.graph);
         series = new LineGraphSeries<>(new DataPoint[] {
         });
         series.setTitle(getResources().getString(R.string.time));
@@ -252,7 +265,7 @@ public class TempsActivity extends AppCompatActivity {
 
             if(carpeta.exists()){
 
-                File textFile = new File(Environment.getExternalStorageDirectory()+"/TimeCounterData", data + ".txt");
+                File textFile = new File(Environment.getExternalStorageDirectory()+"/TimeCounterData", data + prova + ".txt");
                 try{
                     FileOutputStream fos = new FileOutputStream(textFile);
                     fos.write(texto.getBytes());

@@ -12,9 +12,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Adapter;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -39,12 +41,15 @@ import java.util.Calendar;
 public class EstadistiquesActivity extends AppCompatActivity {
 
     ArrayList<String> temps = new ArrayList<String>();
-    ArrayList<Integer> tempsGrafic = new ArrayList<Integer>();
+    ArrayList<Double> tempsGrafic = new ArrayList<Double>();
     RecyclerView recycler;
     Adaptador adaptador;
+    String prova="";
+    GraphView graph;
     LineGraphSeries<DataPoint> series;
     LineGraphSeries<DataPoint> average;
-
+    int min=0;
+    int max=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +62,9 @@ public class EstadistiquesActivity extends AppCompatActivity {
 
         Glide.with(this).load("file:///android_asset/bluetooth.png").into(imgBluetooth);
         Glide.with(this).load("file:///android_asset/volver.png").into(imgVolver);
+
+        recycler=findViewById(R.id.recyclerView);
+        recycler.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
 
         graphInit();
 
@@ -71,11 +79,23 @@ public class EstadistiquesActivity extends AppCompatActivity {
         spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(spinnerArrayAdapter);
 
-        recycler=findViewById(R.id.recyclerView);
-        recycler.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if(position==0) prova="ac";
+                else if (position == 1) prova="sk";
+                else if (position == 2) prova="au";
+                else if (position == 3) prova="en";
 
+                llegirSD();
+            }
 
-        llegirSD();
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
     }
 
     public void volver(View view) {
@@ -91,41 +111,78 @@ public class EstadistiquesActivity extends AppCompatActivity {
         if(comprobarSD() && comprovarPermisEscriureSD()){
             StringBuilder sb = new StringBuilder();
             try{
+                Boolean algunArxiu=false;
+                Boolean primerValor=true;
+
                 File directorio = new File(Environment.getExternalStorageDirectory()+"/TimeCounterData");
                 File[] listaArchivos = directorio.listFiles();
-                File textFile = new File(Environment.getExternalStorageDirectory()+"/TimeCounterData", listaArchivos[1].getName());
-                FileInputStream fis = new FileInputStream(textFile);
 
-                if(fis != null){
-                    InputStreamReader isr = new InputStreamReader(fis);
-                    BufferedReader buff = new BufferedReader(isr);
+                temps.clear();
+                tempsGrafic.clear();
 
-                    String line = null;
-                    int i=1;
-                    while((line = buff.readLine()) != null){
-                        line=line.replace("&", ""); //eliminar final de linia
-                        temps.add((i+" -   "+line));
-                        int Ss,Sd, Sm;
+                String borrar="";
+                int pos=1;
 
-                        Ss = Integer.parseInt(line.substring(0, line.indexOf(':')));
-                        line=line.substring(line.indexOf(':')+1, line.length());
-                        Sd = Integer.parseInt(line.substring(0, line.indexOf(':')));
-                        line=line.substring(line.indexOf(':')+1, line.length());
-                        Sm = Integer.parseInt(line);
-                        tempsGrafic.add(Ss+Sd/60+Sm/600);
+                for(int i=0; i<listaArchivos.length; i++){
 
-                        i++;
+                    if(listaArchivos[i].getName().contains(prova)){ //buscar tots els arxius de la serie
+                        algunArxiu=true;
+
+                        File textFile = new File(Environment.getExternalStorageDirectory()+"/TimeCounterData", listaArchivos[i].getName());
+                        FileInputStream fis = new FileInputStream(textFile);
+
+                        if(fis != null){
+                            InputStreamReader isr = new InputStreamReader(fis);
+                            BufferedReader buff = new BufferedReader(isr);
+
+                            String line = null;
+                            while((line = buff.readLine()) != null && line.contains(":")){
+                                line=line.replace("&", ""); //eliminar final de linia
+                                temps.add((pos+" -   "+line));
+                                int Ss,Sd, Sm;
+
+                                Ss = Integer.parseInt(line.substring(0, line.indexOf(':')));
+                                line=line.substring(line.indexOf(':')+1, line.length());
+                                Sd = Integer.parseInt(line.substring(0, line.indexOf(':')));
+                                line=line.substring(line.indexOf(':')+1, line.length());
+                                Sm = Integer.parseInt(line);
+                                double t=Ss/1.0+Sd/60.0+Sm/60000.0;
+                                Log.d("De", "T="+t);
+                                tempsGrafic.add(t);
+
+
+                                if(primerValor){
+                                    min=(int)t;
+                                    max=(int)t;
+                                    primerValor=false;
+                                }
+                                if(t<min) min=(int)t;
+                                if(t>max) max=(int)t;
+
+                                pos++;
+                            }
+                            fis.close();
+                        }
+
                     }
-                    fis.close();
+                }
+
+                if(algunArxiu){
                     adaptador = new Adaptador(temps);
                     recycler.setAdapter(adaptador);
                     actualitzarGrafic();
+                } else {
+                    Toast.makeText(this, R.string.noArxius, Toast.LENGTH_SHORT).show();
                 }
+
+                Log.d("De", Integer.toString(max));
+
             }catch (IOException e){
                 e.printStackTrace();
             }
+
         }else{
-            Toast.makeText(this, "Cannot Read from External Storage.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.noLlegir, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -147,13 +204,18 @@ public class EstadistiquesActivity extends AppCompatActivity {
 
         DataPoint[] serieMedia = new DataPoint[2];
         serieMedia[0] =  new DataPoint(1, tempsTtotal/tempsGrafic.size());
-        serieMedia[1] =  new DataPoint(tempsGrafic.size()-1, tempsTtotal/tempsGrafic.size());
+        if(tempsGrafic.size()>1) serieMedia[1] =  new DataPoint(tempsGrafic.size()-1, tempsTtotal/tempsGrafic.size());
+        else serieMedia[1] =  new DataPoint(tempsGrafic.size(), tempsTtotal/tempsGrafic.size());
         average.resetData(serieMedia);
+
+
+        graph.getViewport().setMinX(1);
+        graph.getViewport().setMaxX(tempsGrafic.size());
     }
 
 
     void graphInit(){
-        GraphView graph = (GraphView) findViewById(R.id.graph);
+        graph = (GraphView) findViewById(R.id.graph);
         series = new LineGraphSeries<>(new DataPoint[] {
         });
         series.setTitle(getResources().getString(R.string.time));

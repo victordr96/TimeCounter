@@ -22,4 +22,7 @@
     <string name="errorGuardar">Archivo no guardado, ¿Volver a intentar?</string>
     <string name="time">Tiempo [s]</string>
     <string name="average">Promedio [s]</string>
+    <string name="noLlegir">No se pueden leer ficheros de la memoria externa</string>
+    <string name="noArxius">No se han encontrado archivos</string>
+    <string name="noSend">Mensaje no enviado</string>
 </resources>

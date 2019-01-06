@@ -21,4 +21,7 @@
     <string name="errorGuardar">File not saved, try again?</string>
     <string name="time">Time [s]</string>
     <string name="average">Average [s]</string>
+    <string name="noLlegir">Cannot Read from External Storage.</string>
+    <string name="noArxius">No files are found</string>
+    <string name="noSend">Data not sent</string>
 </resources>

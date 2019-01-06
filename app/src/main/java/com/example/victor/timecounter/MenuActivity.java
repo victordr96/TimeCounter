@@ -37,14 +37,37 @@ public class MenuActivity extends AppCompatActivity {
 
     }
 
-    public void temps(View view) {
+    public void acceleration(View view) {
         Intent intent = new Intent(this, TempsActivity.class);
+        intent.putExtra("Prova","ac");
         startActivity(intent);
     }
 
+
+    public void skidpad(View view) {
+        Intent intent = new Intent(this, TempsActivity.class);
+        intent.putExtra("Prova","sk");
+        startActivity(intent);
+    }
+
+
+    public void autocross(View view) {
+        Intent intent = new Intent(this, TempsActivity.class);
+        intent.putExtra("Prova","au");
+        startActivity(intent);
+    }
+
+
+    public void endurance(View view) {
+        Intent intent = new Intent(this, TempsActivity.class);
+        intent.putExtra("Prova","en");
+        startActivity(intent);
+    }
+
+
+
     public void bluetooth(View view) {
         Intent intent = new Intent(this, MonitorActivity.class);
-        //Intent intent = new Intent(this, BluetoothActivity.class);
         startActivity(intent);
     }
 

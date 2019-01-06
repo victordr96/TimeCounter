@@ -44,6 +44,7 @@
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:layout_marginTop="32dp"
+        android:onClick="skidpad"
         app:layout_constraintEnd_toEndOf="@+id/imgAcceleration"
         app:layout_constraintStart_toStartOf="@+id/imgAcceleration"
         app:layout_constraintTop_toBottomOf="@+id/imgAcceleration"
@@ -66,6 +67,7 @@
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:layout_marginTop="32dp"
+        android:onClick="autocross"
         app:layout_constraintEnd_toEndOf="@+id/imgSkidpad"
         app:layout_constraintStart_toStartOf="@+id/imgSkidpad"
         app:layout_constraintTop_toBottomOf="@+id/imgSkidpad"
@@ -96,6 +98,7 @@
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:layout_marginTop="32dp"
+        android:onClick="endurance"
         app:layout_constraintEnd_toEndOf="@+id/imgAutocross"
         app:layout_constraintStart_toStartOf="@+id/imgAutocross"
         app:layout_constraintTop_toBottomOf="@+id/imgAutocross"
@@ -115,12 +118,11 @@
         android:id="@+id/imgAcceleration"
         android:layout_width="70dp"
         android:layout_height="70dp"
-        android:layout_marginStart="50dp"
-        android:layout_marginLeft="50dp"
+        android:layout_marginStart="32dp"
         android:layout_marginTop="32dp"
+        android:onClick="acceleration"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/viewSeparador"
-        android:onClick="temps"
         app:srcCompat="@color/colorAccent" />
 
 

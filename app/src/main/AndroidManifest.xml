@@ -25,7 +25,8 @@
         <activity android:name=".TempsActivity" />
         <activity android:name=".BluetoothActivity" />
         <activity android:name=".MonitorActivity" />
-        <activity android:name=".EstadistiquesActivity"></activity>
+        <activity android:name=".EstadistiquesActivity" />
+        <activity android:name=".ConnexioBTActivity"></activity>
     </application>
 
 </manifest>
