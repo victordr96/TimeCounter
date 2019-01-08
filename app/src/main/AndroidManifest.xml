@@ -26,7 +26,8 @@
         <activity android:name=".BluetoothActivity" />
         <activity android:name=".MonitorActivity" />
         <activity android:name=".EstadistiquesActivity" />
-        <activity android:name=".ConnexioBTActivity"></activity>
+        <activity android:name=".ConnexioBTActivity" />
+        <activity android:name=".BluetoothConnectionActivity"></activity>
     </application>
 
 </manifest>

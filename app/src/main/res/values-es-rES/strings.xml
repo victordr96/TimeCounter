@@ -25,4 +25,6 @@
     <string name="noLlegir">No se pueden leer ficheros de la memoria externa</string>
     <string name="noArxius">No se han encontrado archivos</string>
     <string name="noSend">Mensaje no enviado</string>
+    <string name="BTenviado">Mensaje no enviado</string>
+    <string name="BTnotConnected">BT no conectado</string>
 </resources>

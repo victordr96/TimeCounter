@@ -8,17 +8,6 @@
 
 
     <ImageView
-        android:id="@+id/imgMonitor"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:onClick="monitor"
-        app:layout_constraintBottom_toBottomOf="@+id/btBTconnect"
-        app:layout_constraintEnd_toEndOf="@+id/imgBluetooth"
-        app:layout_constraintStart_toEndOf="@+id/txtEstadoBT"
-        app:layout_constraintTop_toTopOf="@+id/btBTconnect"
-        app:srcCompat="@color/colorAccent" />
-
-    <ImageView
         android:id="@+id/imgBluetooth"
         android:layout_width="30dp"
         android:layout_height="30dp"
@@ -91,29 +80,14 @@
         tools:text="TextView" />
 
     <Button
-        android:id="@+id/button2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
-        android:onClick="buscarDispositivos"
-        android:text="Start Discovery"
-        app:layout_constraintStart_toEndOf="@+id/button"
-        app:layout_constraintTop_toTopOf="@+id/button" />
-
-    <Button
         android:id="@+id/button3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginLeft="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginRight="8dp"
-        android:text="Stop discovery"
-        android:onClick="cancelarBuscarDispositivos"
+        android:onClick="enviar"
+        android:text="Enviar"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/button2"
-        app:layout_constraintTop_toTopOf="@+id/button2" />
+        app:layout_constraintTop_toTopOf="@+id/button" />
 
     <Button
         android:id="@+id/btBTconnect"

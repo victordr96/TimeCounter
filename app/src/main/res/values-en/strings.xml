@@ -25,4 +25,6 @@
     <string name="noLlegir">Cannot Read from External Storage.</string>
     <string name="noArxius">No files are found</string>
     <string name="noSend">Data not sent</string>
+    <string name="BTenviado">Data sent</string>
+    <string name="BTnotConnected">BT not connected</string>
 </resources>

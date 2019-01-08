@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -103,10 +104,6 @@ public class EstadistiquesActivity extends AppCompatActivity {
     }
 
 
-
-
-
-
     private void llegirSD(){
         if(comprobarSD() && comprovarPermisEscriureSD()){
             StringBuilder sb = new StringBuilder();
@@ -168,7 +165,7 @@ public class EstadistiquesActivity extends AppCompatActivity {
                 }
 
                 if(algunArxiu){
-                    adaptador = new Adaptador(temps);
+                    adaptador = new Adaptador(this, temps);
                     recycler.setAdapter(adaptador);
                     actualitzarGrafic();
                 } else {

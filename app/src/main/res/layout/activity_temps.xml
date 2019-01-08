@@ -12,7 +12,7 @@
         android:layout_width="45dp"
         android:layout_height="45dp"
         android:layout_marginEnd="64dp"
-        android:onClick="volver"
+        android:onClick="btnRestart"
         app:layout_constraintBottom_toBottomOf="@+id/imgPause"
         app:layout_constraintEnd_toEndOf="parent"
         app:srcCompat="@color/colorAccent" />
@@ -25,7 +25,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="16dp"
-        android:onClick="volver"
+        android:onClick="btnPause"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/imgRestart"
         app:layout_constraintStart_toEndOf="@+id/imgStart"
@@ -37,7 +37,7 @@
         android:layout_width="45dp"
         android:layout_height="45dp"
         android:layout_marginStart="64dp"
-        android:onClick="volver"
+        android:onClick="btnStart"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/imgPause"
         app:srcCompat="@color/colorAccent" />

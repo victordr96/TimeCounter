@@ -1,6 +1,9 @@
 package com.example.victor.timecounter;
 
 import android.Manifest;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -13,6 +16,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -24,19 +28,27 @@ import com.jjoe64.graphview.LegendRenderer;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 
 public class TempsActivity extends AppCompatActivity {
 
     Boolean TEST=true; //si true, genera dades aleatories sense bluetooth per provar
+    Boolean BTON=false; //si BT està connectat
+    Boolean SortidaNoEsperada=true; //Si true guarda un arxiu temporal al tancar l'activitat
     ArrayList<String> temps = new ArrayList<String>();
     GraphView graph;
     LineGraphSeries<DataPoint> series;
@@ -47,6 +59,7 @@ public class TempsActivity extends AppCompatActivity {
     TextView txtLast3;
     TextView txtLast4;
     TextView txtBest;
+    TextView txtEstadoBT;
     double sumaTiempos=0;
     int graphPos=4;
     int bestS=99;
@@ -54,6 +67,12 @@ public class TempsActivity extends AppCompatActivity {
     int bestM=999;
     String best;
     String prova="";
+    private BluetoothAdapter mBluetoothAdapter;
+    BluetoothSocket btSocket = null;
+    InputStream tmpIn = null;
+    OutputStream tmpOut = null;
+    BluetoothDevice dispositivo=null;
+    static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
 
     @Override
@@ -61,16 +80,12 @@ public class TempsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_temps);
 
-        Intent intent = getIntent();
-        if(intent!=null){
-            prova = intent.getStringExtra("Prova");
-        }
-
         txtLast1 = findViewById(R.id.txtLast1);
         txtLast2 = findViewById(R.id.txtLast2);
         txtLast3 = findViewById(R.id.txtLast3);
         txtLast4 = findViewById(R.id.txtLast4);
         txtBest = findViewById(R.id.txtBest);
+        txtEstadoBT = findViewById(R.id.txtEstadoBT);
 
         ImageView imgBluetooth = findViewById(R.id.imgBluetooth);
         ImageView imgVolver = findViewById(R.id.imgVolver);
@@ -84,12 +99,24 @@ public class TempsActivity extends AppCompatActivity {
         Glide.with(this).load("file:///android_asset/pause.png").into(imgPause);
         Glide.with(this).load("file:///android_asset/replay.png").into(imgRestart);
 
+
+
+        Intent intent = getIntent();
+        if(intent!=null){
+            BTON = intent.getBooleanExtra("EstatBT",false);
+        }
+
+
+        if(BTON) txtEstadoBT.setText(R.string.estadoBT_conectado);
+
         graphInit();
         txtLast1.setText("--:--:---");
         txtLast2.setText("--:--:---");
         txtLast3.setText("--:--:---");
         txtLast4.setText("--:--:---");
         txtBest.setText("--:--:---");
+
+
 
         //anadirTiempo(1, 50, 123);
         //anadirTiempo(2, 51, 124);
@@ -106,27 +133,35 @@ public class TempsActivity extends AppCompatActivity {
 
     public void volver(View view) {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        if(temps.size()>0){
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-        builder.setMessage(R.string.dialogoGuardar).setTitle(R.string.exit);
+            builder.setMessage(R.string.dialogoGuardar).setTitle(R.string.exit);
 
-        builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                escriureArxiu();
-                finish();
+            builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    escriureArxiu();
+                    SortidaNoEsperada=false;
+                    finish();
 
-            }
-        });
+                }
+            });
 
-        builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                finish();
-            }
-        });
+            builder.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    SortidaNoEsperada=false;
+                    finish();
+                }
+            });
 
-        builder.show();
+            builder.show();
+        } else {
+            finish();
+        }
+
+
     }
 
 
@@ -290,6 +325,39 @@ public class TempsActivity extends AppCompatActivity {
         }
     }
 
+
+
+    public void escriureArxiuTemp(){
+
+        String texto = crearTextArxiu();
+
+        if(comprobarSD() && comprovarPermisEscriureSD()){
+
+            File carpeta = new File(Environment.getExternalStorageDirectory(), "TimeCounterData");
+            if(!carpeta.exists()) {
+                carpeta.mkdirs();
+                carpeta = new File(Environment.getExternalStorageDirectory(), "TimeCounterData");
+            }
+
+            if(carpeta.exists()){
+
+                File textFile = new File(Environment.getExternalStorageDirectory()+"/TimeCounterData", "TEMP" + prova + ".txt");
+                try{
+                    FileOutputStream fos = new FileOutputStream(textFile);
+                    fos.write(texto.getBytes());
+                    fos.close();
+                }catch (IOException e){
+                    e.printStackTrace();
+                }
+
+            }
+
+        }
+    }
+
+
+
+
     public  boolean comprovarPermisEscriureSD() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -346,6 +414,139 @@ public class TempsActivity extends AppCompatActivity {
     }
 
 
+    public void btnStart(View view) {
+        if(BTON) {
+            try {
+                tmpOut.write("s".getBytes());
+                Toast.makeText(this, R.string.BTenviado, Toast.LENGTH_SHORT).show();
+            } catch (IOException e) {
+                Toast.makeText(this, R.string.noSend, Toast.LENGTH_SHORT).show();
+            }
+        }
+        Toast.makeText(this, R.string.BTnotConnected, Toast.LENGTH_SHORT).show();
+    }
+
+
+    public void btnPause(View view) {
+        if(BTON) {
+            try {
+                tmpOut.write("p".getBytes());
+                Toast.makeText(this, R.string.BTenviado, Toast.LENGTH_SHORT).show();
+            } catch (IOException e) {
+                Toast.makeText(this, R.string.noSend, Toast.LENGTH_SHORT).show();
+            }
+        }
+        Toast.makeText(this, R.string.BTnotConnected, Toast.LENGTH_SHORT).show();
+    }
+
+    public void btnRestart(View view) {
+        if(BTON) {
+            try {
+                tmpOut.write("r".getBytes());
+                Toast.makeText(this, R.string.BTenviado, Toast.LENGTH_SHORT).show();
+            } catch (IOException e) {
+                Toast.makeText(this, R.string.noSend, Toast.LENGTH_SHORT).show();
+            }
+        }
+        Toast.makeText(this, R.string.BTnotConnected, Toast.LENGTH_SHORT).show();
+    }
+
+
+
+    public void onStop () {
+        if(SortidaNoEsperada && temps.size()>0){ //Crea arxiu temporal amb les dades
+            escriureArxiuTemp();
+        }
+        super.onStop();
+    }
+
+    public void onStart(){
+        Intent intent = getIntent();
+        if(intent!=null){
+            prova = intent.getStringExtra("Prova");
+            BTON = intent.getBooleanExtra("EstatBT",true);
+        }
+        buscarArchiuTemporal(prova);
+        super.onStart();
+    }
+
+
+    private void buscarArchiuTemporal(String s){
+
+        if(comprobarSD() && comprovarPermisEscriureSD()){
+            StringBuilder sb = new StringBuilder();
+
+            try{
+                Boolean primerValor=true;
+
+                File directorio = new File(Environment.getExternalStorageDirectory()+"/TimeCounterData");
+                File[] listaArchivos = directorio.listFiles();
+
+                for(int i=0; i<listaArchivos.length; i++){
+
+                    if(listaArchivos[i].getName().contains("TEMP")){ //buscar tots els arxius de la serie
+                        File textFile = new File(Environment.getExternalStorageDirectory()+"/TimeCounterData", listaArchivos[i].getName());
+                        if(listaArchivos[i].getName().contains(prova)){
+
+                            FileInputStream fis = new FileInputStream(textFile);
+
+                            if(fis != null){
+                                InputStreamReader isr = new InputStreamReader(fis);
+                                BufferedReader buff = new BufferedReader(isr);
+
+                                String line = null;
+                                while((line = buff.readLine()) != null && line.contains(":")){
+                                    line=line.replace("&", ""); //eliminar final de linia
+                                    temps.add(line);
+                                    int Ss,Sd, Sm;
+
+                                    Ss = Integer.parseInt(line.substring(0, line.indexOf(':')));
+                                    line=line.substring(line.indexOf(':')+1, line.length());
+                                    Sd = Integer.parseInt(line.substring(0, line.indexOf(':')));
+                                    line=line.substring(line.indexOf(':')+1, line.length());
+                                    Sm = Integer.parseInt(line);
+
+                                    boolean comprovarMillor=false;
+                                    if(Ss<bestS) comprovarMillor=true;
+                                    else if(Ss==bestS && Sd<bestD) comprovarMillor=true;
+                                    else if (Ss==bestS && Sd==bestD && Sm<bestM) comprovarMillor=true;
+
+                                    if(comprovarMillor || primerValor){
+                                        primerValor=false;
+                                        bestS=Ss;
+                                        bestD=Sd;
+                                        bestM=Sm;
+                                        best=Ss+":"+Sd+":"+Sm;
+                                    }
+
+                                }
+                                fis.close();
+                            }
+
+                            if(temps.size()>0){
+                                txtLast1.setText(temps.get(temps.size()-1));
+                                txtBest.setText(best);
+                            }
+                            if(temps.size()>1) txtLast2.setText(temps.get(temps.size()-2));
+                            if(temps.size()>2) txtLast3.setText(temps.get(temps.size()-3));
+                            if(temps.size()>3) txtLast4.setText(temps.get(temps.size()-4));
+
+
+
+                        }
+
+                        textFile.delete(); //eliminar tots els arxius temporals
+                    }
+
+
+
+
+                }
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+    }
 
 
 }

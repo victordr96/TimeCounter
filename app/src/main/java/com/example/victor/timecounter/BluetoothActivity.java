@@ -1,5 +1,6 @@
 package com.example.victor.timecounter;
 
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -30,9 +31,11 @@ public class BluetoothActivity extends AppCompatActivity {
     InputStream tmpIn = null;
     OutputStream tmpOut = null;
     BluetoothDevice dispositivo=null;
+    Boolean BTON=false;
     private ArrayList<String> BTdispositivosEncontrados;
     static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     int i=0;
+    TextView txtEstadoBT;
 
     private static final int REQUEST_ENABLE_BT = 1;
 
@@ -41,16 +44,16 @@ public class BluetoothActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bluetooth);
 
+
+        txtEstadoBT = findViewById(R.id.txtEstadoBT);
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         BTdispositivosEncontrados = new ArrayList<String>();
         IntentFilter intentFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
 
         ImageView imgBluetooth = findViewById(R.id.imgBluetooth);
         ImageView imgVolver = findViewById(R.id.imgVolver);
-        ImageView imgMonitor = findViewById(R.id.imgMonitor);
         Glide.with(this).load("file:///android_asset/bluetooth.png").into(imgBluetooth);
         Glide.with(this).load("file:///android_asset/volver.png").into(imgVolver);
-        Glide.with(this).load("file:///android_asset/screen.png").into(imgMonitor);
 
 
 
@@ -76,6 +79,11 @@ public class BluetoothActivity extends AppCompatActivity {
 
 
     public void volver(View view) {
+
+        Intent returnIntent = new Intent();
+        if(BTON==true) setResult(Activity.RESULT_OK, returnIntent);
+        else setResult(Activity.RESULT_CANCELED, returnIntent);
+        finish();
 
         finish();
     }
@@ -119,11 +127,13 @@ public class BluetoothActivity extends AppCompatActivity {
 
     }
 
-    public void cancelarBuscarDispositivos(View view) {
-        try {
-            tmpOut.write(i);
-            i++;
-        } catch (IOException e) { }
+    public void enviar(View view) {
+        if(BTON){
+            try {
+                tmpOut.write(i);
+                i++;
+            } catch (IOException e) { }
+        }
     }
 
 
@@ -144,18 +154,29 @@ public class BluetoothActivity extends AppCompatActivity {
     }
 
     public void BTconnect(View view) {
+
         try {
             btSocket = dispositivo.createInsecureRfcommSocketToServiceRecord(myUUID);//create a RFCOMM (SPP) connection
             btSocket.connect();
+            BTON=true;
+            txtEstadoBT.setText(R.string.estadoBT_conectado);
         } catch (IOException e) {
+            BTON=false;
+            txtEstadoBT.setText(R.string.estadoBT_desconectado);
             e.printStackTrace();
         }
 
 
-        try {
-            tmpIn = btSocket.getInputStream();
-            tmpOut = btSocket.getOutputStream();
-        } catch (IOException e) { }
+        if(BTON){
+            try {
+                tmpIn = btSocket.getInputStream();
+                tmpOut = btSocket.getOutputStream();
+            } catch (IOException e) {
+                BTON=false;
+                txtEstadoBT.setText(R.string.estadoBT_desconectado);
+            }
+        }
+
 
     }
 

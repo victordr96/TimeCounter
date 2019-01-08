@@ -25,4 +25,6 @@
     <string name="noLlegir">No es poden llegir fitxers de l\'emmagatzament extern</string>
     <string name="noArxius">No s\'han trobat arxius</string>
     <string name="noSend">Missatge no enviat</string>
+    <string name="BTenviado">Missatge enviat</string>
+    <string name="BTnotConnected">BT no connectat</string>
 </resources>
